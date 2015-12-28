@@ -1,0 +1,9 @@
+---
+    title: {{ version }}
+    description: SDK documentation {{ version }}
+---
+<div markdown="0" class="sdk-documentation">
+{% for class in classes %}
+    {% include 'class.jinja2' %}
+{% endfor %}
+</div>

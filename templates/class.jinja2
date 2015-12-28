@@ -1,0 +1,49 @@
+<h2 id="{{ class.class['longname']|replace('.', '-') }}">{{ class.class['name'] }}</h2>
+<hr/>
+{{ class.class['longname'] }}
+<br/>
+{% if class.constructor %}
+    <table class="constructor">
+        <thead>
+        <tr>
+            <td colspan="2">Constructor</td>
+        </tr>
+        </thead>
+        {% set constructor=class.constructor %}
+        <tr>{% include 'constructor.jinja2' %}</tr>
+    </table>
+    <br/>
+{% endif %}
+
+{% if class.methods %}
+    <table class="methods">
+        <thead>
+        <tr>
+            <td colspan="2">Methods</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for method in class.methods %}
+            <tr>{% include 'method.jinja2' %}</tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br/>
+
+{% endif %}
+
+{% if class.properties %}
+    <table class="properties">
+        <thead>
+        <tr>
+            <td colspan="2">Properties</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for property in class.properties %}
+            <tr>{% include 'property.jinja2' %}</tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br/>
+{% endif %}

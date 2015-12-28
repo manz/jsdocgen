@@ -1,0 +1,9 @@
+<td>{{ method['signature'] }}</td><td markdown="1">
+{% if method['returnValue'] %}**Return Value**: {{ method['returnValue'] }}{% endif %}
+
+{% if method['deprecated'] %}
+**Deprecated**
+{% endif %}
+{{ method['description'] }}
+
+</td>
