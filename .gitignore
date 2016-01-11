@@ -1,0 +1,6 @@
+*~
+.DS_Store
+*.pyc
+jsdocgen.egg-info
+.idea
+node_modules
