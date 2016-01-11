@@ -1,0 +1,13 @@
+<td>{{ constructor['signature'] }}</td>
+<td>
+<div markdown="1">
+{{ '{% raw %}' }}
+{% if constructor['shortDescription'] %}
+{{ constructor['shortDescription'] }}
+{% else %}
+{{ constructor['description'] }}
+{% endif %}
+
+{{ '{% endraw %}' }}
+</div>
+</td>

@@ -1,7 +1,25 @@
-<h2 id="{{ class.class['longname']|replace('.', '-') }}">{{ class.class['name'] }}</h2>
+<h2 id="{{ class['longname'] }}">{{ class['name'] }} class</h2>
 <hr/>
-{{ class.class['longname'] }}
+{% if class['virtual'] %}<span markdown="1" class="abstract-doc">**Abstract**</span>{% endif %} <code>{{ class['longname'] }}</code>
 <br/>
+{% if class.parents %}
+    This class extends {{ class.parents|join(', ') }}.
+    <br/>
+{% endif %}
+<br/>
+{% if class.constructor and class.constructor.examples %}
+<div markdown="1">
+{{ '{% raw %}' }}
+{% for example in class.constructor.examples %}
+### {{ example }}
+
+{% endfor %}
+{{ '{% endraw %}' }}
+
+</div>
+<br/>
+{% endif %}
+
 {% if class.constructor %}
     <table class="constructor">
         <thead>
@@ -24,7 +42,9 @@
         </thead>
         <tbody>
         {% for method in class.methods %}
+            {% if not method.inherited %}
             <tr>{% include 'method.jinja2' %}</tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>

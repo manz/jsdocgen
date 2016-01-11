@@ -1,0 +1,31 @@
+<h2 id="{{ typedef['longname'] }}">{{ typedef['name'] }} object Specification</h2>
+<hr/>
+<div markdown="1">
+{% if typedef.examples %}
+{{ '{% raw %}' }}
+{% for example in typedef.examples %}
+### {{ example }}
+
+{% endfor %}
+{{ '{% endraw %}' }}
+
+{% endif %}
+</div>
+{% if typedef.signature %}
+    {{ typedef.signature }}{% if typedef.returnValue %}: {{ typedef.returnValue }}{% endif %}
+{% endif %}
+{% if typedef.properties %}
+    <table class="properties">
+        <thead>
+        <tr>
+            <td colspan="2">Properties</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for property in typedef.properties %}
+            <tr>{% include 'property.jinja2' %}</tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br/>
+{% endif %}

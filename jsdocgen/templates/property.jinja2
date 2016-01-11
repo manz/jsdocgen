@@ -1,0 +1,14 @@
+<td>{{ property['name'] }}{% if property['optional'] %}?{% endif %}</td>
+<td>
+    {% if property['typeRef'] %}
+        <b>Type</b>: {{ property['typeRef'] }}
+    {% endif %}
+
+<div markdown="1">
+{{ '{% raw %}' }}
+{{ property['description'] }}
+
+{{ '{% endraw %}' }}
+</div>
+
+</td>
