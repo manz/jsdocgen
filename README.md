@@ -6,7 +6,7 @@ Generates page to be integrated in a jekyll website
 
 ```ShellSession
 $ npm install jsdoc-parse
-$ pip install git://github.com/manz/wgsdocgen
+$ pip install git+https://github.com/manz/jsdocgen.git
 ```
 
 ## Usage
