@@ -16,7 +16,7 @@ $ js-doc-gen --help
 usage: generate.py [-h] [--package-version PACKAGE_VERSION] [--output OUTPUT]
                    [--google-maps]
 
-Generates HTML+MD documentation from jsdoc-parse output
+Generates a jekyll file from jsdoc-parse output read from stdin.
 
 optional arguments:
   -h, --help            show this help message and exit

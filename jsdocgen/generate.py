@@ -5,7 +5,7 @@ import re
 
 from .documentation import Documentation
 
-parser = argparse.ArgumentParser(description='Generates HTML+MD documentation from jsdoc-parse output')
+parser = argparse.ArgumentParser(description='Generates a jekyll file from jsdoc-parse output read from stdin.')
 parser.add_argument('--package-version', dest='package_version', action='store',
                     help='the package version')
 parser.add_argument('--output', action='store', help='Output file, defaults to stdout')
