@@ -19,7 +19,7 @@ if __name__ == '__main__':
     if 'help' in result:
         parser.print_help()
     else:
-        if 'package_version' in result:
+        if 'package_version' in result and result.package_version:
             match = VERSION_REGEX.match(result.package_version)
             version = match.group(1) if match else result.package_version
         else:
