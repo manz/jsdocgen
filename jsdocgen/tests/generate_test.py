@@ -100,3 +100,11 @@ class GenerateTest(TestCase):
         doc.google_maps_links = False
         type_ref = doc.generate_type_reference('google.maps.Map')
         self.assertEquals(type_ref, 'google.maps.Map')
+
+    def test_generate_type_reference_should_resolve_google_maps_in_arrays(self):
+        doc = Documentation({}, 1.1, google_maps_links=True)
+        type_ref = doc.generate_type_reference('Array.<google.maps.Map>')
+        self.assertEquals(type_ref, 'Array.&lt;<a target="_blank" href="https://developers.google.com/maps/documentation/javascript/reference#Map">google.maps.Map</a>&gt;')
+        doc.google_maps_links = False
+        type_ref = doc.generate_type_reference('google.maps.Map')
+        self.assertEquals(type_ref, 'google.maps.Map')

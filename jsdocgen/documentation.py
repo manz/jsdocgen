@@ -12,7 +12,7 @@ logger.addHandler(StreamHandler())
 
 
 class Documentation(object):
-    ARRAY_OF_REGEX = re.compile('[aA]rray\.<([A-Za-z][A-Za-z0-9]+)>')
+    ARRAY_OF_REGEX = re.compile('[aA]rray\.<([A-Za-z][A-Za-z0-9.]+)>')
     GOOGLE_REF_PREFIX_URL = 'https://developers.google.com/maps/documentation/javascript/reference'
 
     def __init__(self, documentation, version, google_maps_links=False):
