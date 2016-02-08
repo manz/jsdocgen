@@ -38,11 +38,6 @@ class Documentation(object):
             elif doc_element['kind'] == 'typedef':
                 type_name = doc_element['longname']
                 self.references.add(doc_element['longname'])
-                properties = doc_element.get('properties', [])
-                for prop in properties:
-                    if 'type' in prop:
-                        prop['typeRef'] = self.generate_types_reference(prop['type']['names'])
-
                 self.typedefs[type_name] = doc_element
 
         for doc_element in documentation:
@@ -183,20 +178,30 @@ class Documentation(object):
 
         return class_doc
 
+    def get_typedef_documentation(self, typedef_key):
+        typedef = self.typedefs[typedef_key]
+
+        properties = typedef.get('properties', [])
+        for prop in properties:
+            if 'type' in prop:
+                prop['typeRef'] = self.generate_types_reference(prop['type']['names'])
+
+        # we have a typedef for a callback
+        if 'params' in typedef:
+            named_params = self.generate_named_params(typedef)
+            typedef['signature'] = 'function(' + ','.join(named_params) + ')'
+            if 'returns' in typedef:
+                return_value = self.generate_method_return_value(typedef)
+                typedef['returnValue'] = return_value
+
+        return typedef
+
     def generate(self):
         classes_doc = [self.get_class_documentation(class_name) for class_name in self.classes.keys()]
         classes_doc.sort(key=lambda c: c['name'])
 
-        typedefs_doc = [value for key, value in self.typedefs.items()]
-
-        for typedef in typedefs_doc:
-            # we have a typedef for a callback
-            if 'params' in typedef:
-                named_params = self.generate_named_params(typedef)
-                typedef['signature'] = 'function(' + ','.join(named_params) + ')'
-                if 'returns' in typedef:
-                    return_value = self.generate_method_return_value(typedef)
-                    typedef['returnValue'] = return_value
+        typedefs_doc = [self.get_typedef_documentation(typedef_name) for typedef_name in self.typedefs.keys()]
+        typedefs_doc.sort(key=lambda c: c['name'])
 
         main_template = self.env.get_template('main.jinja2')
 
