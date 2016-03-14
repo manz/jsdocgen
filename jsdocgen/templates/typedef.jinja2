@@ -1,5 +1,6 @@
 <h2 id="{{ typedef['longname'] }}">{{ typedef['name'] }} object Specification</h2>
 <hr/>
+{% if typedef['deprecated'] %}<span class="deprecated">Deprecated</span>{% endif %}
 <div markdown="1">
 {% if typedef.examples %}
 {{ '{% raw %}' }}
