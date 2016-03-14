@@ -210,5 +210,5 @@ class Documentation(object):
             'typedefs': typedefs_doc,
             'version': self.version,
             'references': self.references,
-            'prerelease': self.experimental
+            'experimental': self.experimental
         })
