@@ -1,6 +1,9 @@
 {% include 'front.yml.jinja2' %}
 
 <div markdown="0" class="sdk-documentation">
+{% if experimental %}
+<div class="experimental">Experimental</div>
+{% endif %}
     {% for class in classes %}
         {% include 'class.jinja2' %}
     {% endfor %}
