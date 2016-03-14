@@ -1,10 +1,10 @@
 <td>{{ method['signature'] }}</td><td markdown="1">
-{% if method['returnValue'] %}**Return Value**: {{ method['returnValue'] }}{% endif %}
+{% if method['returnValue'] %}<span markdown="0"><b>Return Value</b>: {{ method['returnValue'] }}</span>{% endif %}
 
 <div markdown="1">
 {{ '{% raw %}' }}
 {% if method['deprecated'] %}
-**Deprecated**
+<span class="deprecated">Deprecated</span>
 {% endif %}
 {% if method.virtual %}
 **Abstract**
