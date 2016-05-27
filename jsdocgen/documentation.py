@@ -162,7 +162,7 @@ class Documentation(object):
 
         class_doc = {
             'name': class_['name'],
-            'longname': class_['longname'],
+            'longname': class_['name'] if '<anonymous>' in class_['longname'] else class_['longname'],
             'constructor': constructor,
             'methods': methods,
             'parents': parent_classes,
