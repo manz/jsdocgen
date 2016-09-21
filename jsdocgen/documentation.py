@@ -86,8 +86,9 @@ class Documentation(object):
                 self.references.add(doc_element['longname'])
                 self.enums[enum_name] = doc_element
             elif doc_element['kind'] == 'function' and doc_element['scope'] == 'static':
-                self.functions[doc_element['longname']] = doc_element
-                self.tree.push(doc_element['longname'])
+                if doc_element['longname'] != 'module.exports':
+                    self.functions[doc_element['longname']] = doc_element
+                    self.tree.push(doc_element['longname'])
 
         for doc_element in documentation:
             if 'memberof' in doc_element:
