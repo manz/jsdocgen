@@ -1,14 +1,33 @@
 {% include 'front.yml.jinja2' %}
+{% import 'macroes.html' as utils %}
 
 <div markdown="0" class="sdk-documentation">
-{% if experimental %}
-<div class="experimental">Experimental</div>
-{% endif %}
-    {% for class in classes %}
-        {% include 'class.jinja2' %}
+    {% if experimental %}
+        <div class="experimental">Experimental</div>
+    {% endif %}
+    {% if tree %}
+        <ul>
+            {% include 'tree/tree.jinja2' %}
+        </ul>
+    {% endif %}
+    {% for element in elements %}
+        {% if element.docType == 'class' %}
+            {% set class=element %}
+            {% include 'class.jinja2' %}
+
+        {% elif element.docType=='enum' %}
+            {% set enum=element %}
+            {{ utils.render_title(element, 'constants') }}
+            {% include 'enum.jinja2' %}
+        {% elif element.docType=='typedef' %}
+            {% set typedef=element %}
+            {{ utils.render_title(element, 'object Specification') }}
+            {% include 'typedef.jinja2' %}
+        {% elif element.docType=='func' %}
+            {% set function=element %}
+            {% include 'function.jinja2' %}
+        {% endif %}
+
     {% endfor %}
 
-    {% for typedef in typedefs %}
-        {% include 'typedef.jinja2' %}
-    {% endfor %}
 </div>

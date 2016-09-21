@@ -1,0 +1,12 @@
+    <li>{{ tree.prefix }}</li>
+    <ul>
+        {% for child in tree.children %}
+            {% if child.children %}
+                {% with tree=child %}
+                    {% include 'tree/tree.jinja2' %}
+                {% endwith %}
+            {% else %}
+                <li><a href="#{{ child.long }}">{{ child.short }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>

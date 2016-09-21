@@ -1,0 +1,36 @@
+<hr/>
+{% if enum['deprecated'] %}<span class="deprecated">Deprecated</span>{% endif %}
+<div markdown="1">
+{% if enum['description'] %}
+{{ '{% raw %}' }}
+{{ enum['description'] }}
+{{ '{% endraw %}' }}
+{% endif %}
+{% if enum.examples %}
+{{ '{% raw %}' }}
+{% for example in enum.examples %}
+### {{ example }}
+
+{% endfor %}
+{{ '{% endraw %}' }}
+
+{% endif %}
+</div>
+{% if enum.signature %}
+    {{ enum.signature }}{% if enum.returnValue %}: {{ enum.returnValue }}{% endif %}
+{% endif %}
+{% if enum.properties %}
+    <table class="constants">
+        <thead>
+        <tr>
+            <td colspan="2">Constants</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for property in enum.properties %}
+            <tr>{% include 'property.jinja2' %}</tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br/>
+{% endif %}

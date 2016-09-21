@@ -1,0 +1,6 @@
+{% macro render_title(element, text) -%}
+    <h2 id="{{ element['longname'] }}">{{ element['name'] }} {{ text }}&nbsp;<a class="code-reference"
+                                                                                href="#{{ element['longname'] }}">
+        &#x1f517;</a>
+    </h2>
+{%- endmacro %}

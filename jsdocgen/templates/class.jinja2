@@ -1,5 +1,7 @@
-<h2 id="{{ class['longname'] }}">{{ class['name'] }} class</h2>
+<h2 id="{{ class['longname'] }}">{{ class['name'] }} class&nbsp;<a class="code-reference" href="#{{ class['longname'] }}">&#x1f517;</a>
+</h2>
 <hr/>
+{% if class['deprecated'] %}<span class="deprecated">Deprecated</span>{% endif %}
 {% if class['virtual'] %}<span markdown="1" class="abstract-doc">**Abstract**</span>{% endif %} <code>{{ class['longname'] }}</code>
 <br/>
 {% if class.parents %}
