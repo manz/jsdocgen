@@ -1,7 +1,17 @@
-<h2 id="{{ typedef['longname'] }}">{{ typedef['name'] }} object Specification</h2>
 <hr/>
 {% if typedef['deprecated'] %}<span class="deprecated">Deprecated</span>{% endif %}
+
+{% if typedef.parents %}
+    This object specification extends {{ typedef.parents|join(', ') }}.
+    <br/>
+{% endif %}
+
 <div markdown="1">
+{% if typedef['description'] %}
+{{ '{% raw %}' }}
+{{ typedef['description'] }}
+{{ '{% endraw %}' }}
+{% endif %}
 {% if typedef.examples %}
 {{ '{% raw %}' }}
 {% for example in typedef.examples %}

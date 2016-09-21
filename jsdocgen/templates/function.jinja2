@@ -1,0 +1,28 @@
+{% import 'macroes.html' as utils %}
+
+{{ utils.render_title(function, 'function') }}
+
+<code>{{ function['longname'] }}</code><br/><br/>
+<div markdown="1">
+
+{% if function.examples %}
+{{ '{% raw %}' }}
+{% for example in function.examples %}
+### {{ example }}
+
+{% endfor %}
+{{ '{% endraw %}' }}
+{% endif %}
+
+<table class="function">
+    <thead>
+    <tr>
+        <td colspan="2">Function</td>
+    </tr>
+    </thead>
+    <tbody>
+    {% set method=function %}
+    {% include 'method.jinja2' %}
+    </tbody>
+</table>
+</div>

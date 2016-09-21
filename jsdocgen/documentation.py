@@ -1,9 +1,12 @@
 import logging
+import json
 import os
 import re
 import cgi
 from logging import StreamHandler
 
+from jinja2.ext import with_
+from jinja2.filters import do_mark_safe
 from jinja2.loaders import FileSystemLoader
 from jinja2 import Environment
 
@@ -11,15 +14,50 @@ logger = logging.getLogger('documentation')
 logger.addHandler(StreamHandler())
 
 
+class ReferenceTree(object):
+    def __init__(self):
+        self.tree = {}
+
+    def push(self, long_name):
+        splitted = long_name.split('.')
+
+        if splitted[0] == 'woosmap':
+            root = self.tree
+            for k in splitted[:-1]:
+                if type(root) == dict:
+                    if k not in root:
+                        root[k] = {}
+                    root = root[k]
+                else:
+                    raise RuntimeError('Root is not a dictionary')
+            root[splitted[-1]] = long_name
+
+    def get_as_struct(self, root=None, prefix=None):
+
+        prefix = prefix or []
+
+        root = root or self.tree
+
+        if type(root) == dict:
+            logger.error('.'.join(prefix))
+            children = []
+            for key in sorted(root.keys()):
+                children.append(self.get_as_struct(root[key], prefix + [key]))
+            return {'prefix': '.'.join(prefix), 'children': children}
+
+        else:
+            return {'short': root.split('.')[-1], 'long': root}
+
+
 class Documentation(object):
-    ARRAY_OF_REGEX = re.compile('[aA]rray\.<([A-Za-z][A-Za-z0-9.]+)>')
+    ARRAY_OF_REGEX = re.compile(r'[aA]rray\.<\(?([A-Za-z][A-Za-z0-9.]*(?:\|[A-Za-z][A-Za-z0-9.]*)*)\)?>')
     GOOGLE_REF_PREFIX_URL = 'https://developers.google.com/maps/documentation/javascript/reference'
 
     def __init__(self, documentation, version, google_maps_links=False, experimental=False):
         super(Documentation, self).__init__()
         loader = FileSystemLoader(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'))
         self.google_maps_links = google_maps_links
-        self.env = Environment(loader=loader)
+        self.env = Environment(loader=loader, extensions=(with_,))
         self.experimental = experimental
         self.parented = {}
         self.documentation = documentation
@@ -28,6 +66,9 @@ class Documentation(object):
         self.classes_members = {}
         self.references = set()
         self.typedefs = {}
+        self.enums = {}
+        self.functions = {}
+        self.tree = ReferenceTree()
 
         for doc_element in self.documentation:
             if doc_element['kind'] == 'class':
@@ -35,10 +76,18 @@ class Documentation(object):
                 self.classes[class_name] = doc_element
                 self.classes_members[class_name] = []
                 self.references.add(class_name)
+                self.tree.push(class_name)
             elif doc_element['kind'] == 'typedef':
                 type_name = doc_element['longname']
                 self.references.add(doc_element['longname'])
                 self.typedefs[type_name] = doc_element
+            elif doc_element['kind'] == 'member' and doc_element.get('isEnum', False):
+                enum_name = doc_element['longname']
+                self.references.add(doc_element['longname'])
+                self.enums[enum_name] = doc_element
+            elif doc_element['kind'] == 'function' and doc_element['scope'] == 'static':
+                self.functions[doc_element['longname']] = doc_element
+                self.tree.push(doc_element['longname'])
 
         for doc_element in documentation:
             if 'memberof' in doc_element:
@@ -72,7 +121,7 @@ class Documentation(object):
     def generate_method_signature(self, member):
         named_params = self.generate_named_params(member)
 
-        return member['name'] + '(' + ', '.join(named_params) + ')'
+        return member['name'] + '(<wbr>' + ', '.join(named_params) + ')'
 
     def generate_method_return_value(self, method):
         ret_types = []
@@ -87,7 +136,7 @@ class Documentation(object):
         type_refs = []
         for type_name in type_names:
             type_refs.append(self.generate_type_reference(type_name))
-        return '|'.join(type_refs)
+        return '|<wbr>'.join(type_refs)
 
     def generate_type_reference(self, type_name):
         type_key = type_name
@@ -98,16 +147,18 @@ class Documentation(object):
         type_ref = self._generate_type_reference(type_key)
 
         if match:
-            type_ref = 'Array.&lt;{type_ref}&gt;'.format(type_ref=type_ref)
-
+            type_ref = 'Array.&lt;{type_ref}&gt;'.format(
+                type_ref=self.generate_types_reference(match.group(1).split('|')))
         return type_ref
 
     def _generate_type_reference(self, type_name):
         type_key = type_name
 
         if type_key in self.references:
-            type_ref = '<a href="#{type_key}">{type_key}</a>'.format(
-                type_key=type_key)
+            type_ref = '<a href="#{type_key}">{short_name}</a>'.format(
+                type_key=type_key,
+                short_name=type_key.split('.')[-1]
+            )
         elif self.google_maps_links and type_key.startswith('google.maps.'):
             type_key = type_key.replace('google.maps.', '')
             type_ref = '<a target="_blank" href="{prefix}#{type_key}">{type_name}</a>'.format(
@@ -158,10 +209,12 @@ class Documentation(object):
         properties = properties if 'properties' not in class_ else properties + class_['properties']
         for prop in properties:
             if 'type' in prop:
-                prop['typeRef'] = self.generate_types_reference(prop['type']['names'])
+                prop['typeRef'] = do_mark_safe(self.generate_types_reference(prop['type']['names']))
 
         class_doc = {
+            'docType': 'class',
             'name': class_['name'],
+            'deprecated': class_['deprecated'] if 'deprecated' in class_ else None,
             'longname': class_['name'] if '<anonymous>' in class_['longname'] else class_['longname'],
             'constructor': constructor,
             'methods': methods,
@@ -184,7 +237,7 @@ class Documentation(object):
         properties = typedef.get('properties', [])
         for prop in properties:
             if 'type' in prop:
-                prop['typeRef'] = self.generate_types_reference(prop['type']['names'])
+                prop['typeRef'] = do_mark_safe(self.generate_types_reference(prop['type']['names']))
 
         # we have a typedef for a callback
         if 'params' in typedef:
@@ -194,21 +247,51 @@ class Documentation(object):
                 return_value = self.generate_method_return_value(typedef)
                 typedef['returnValue'] = return_value
 
+        parents = []
+        if 'augments' in typedef:
+            parents = map(lambda c: self.generate_type_reference(c), typedef['augments'])
+
+        if 'description' in typedef:
+            splitted_description = typedef['description'].split('\n')
+            if len(splitted_description) > 1:
+                typedef['description'] = splitted_description[1]
+            else:
+                del typedef['description']
+        typedef['docType'] = 'typedef'
+        typedef['parents'] = parents
+
         return typedef
+
+    def get_enum_documentation(self, enum_key):
+        enum = self.enums[enum_key]
+        enum['docType'] = 'enum'
+        return enum
+
+    def get_function_documentation(self, function_key):
+        function_doc = self.functions[function_key]
+        function_doc['signature'] = self.generate_method_signature(function_doc)
+        function_doc['docType'] = 'func'
+        return function_doc
 
     def generate(self):
         classes_doc = [self.get_class_documentation(class_name) for class_name in self.classes.keys()]
-        classes_doc.sort(key=lambda c: c['name'])
+        classes_doc += [self.get_function_documentation(func_name) for func_name in self.functions.keys()]
+        classes_doc.sort(key=lambda c: c['longname'])
 
         typedefs_doc = [self.get_typedef_documentation(typedef_name) for typedef_name in self.typedefs.keys()]
-        typedefs_doc.sort(key=lambda c: c['name'])
+        typedefs_doc.sort(key=lambda c: c['longname'])
+
+        enums_doc = [self.get_enum_documentation(enum_name) for enum_name in self.enums.keys()]
+        enums_doc.sort(key=lambda c: c['longname'])
+
+        elements = classes_doc + typedefs_doc + enums_doc
 
         main_template = self.env.get_template('main.jinja2')
 
         return main_template.render({
-            'classes': classes_doc,
-            'typedefs': typedefs_doc,
+            'elements': elements,
             'version': self.version,
             'references': self.references,
-            'experimental': self.experimental
+            'experimental': self.experimental,
+            # 'tree': self.tree.get_as_struct()
         })
