@@ -3,6 +3,7 @@ import json
 import os
 import re
 import cgi
+import jinja2
 from logging import StreamHandler
 
 from jinja2.ext import with_
