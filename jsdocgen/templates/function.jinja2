@@ -1,6 +1,10 @@
 {% import 'macroes.html' as utils %}
 
+{% if function.kind == 'typedef' %}
+{{ utils.render_title(function, 'function definition') }}
+{% else %}
 {{ utils.render_title(function, 'function') }}
+{% endif %}
 
 <code>{{ function['longname'] }}</code><br/><br/>
 <div markdown="1">
@@ -21,8 +25,9 @@
     </tr>
     </thead>
     <tbody>
-    {% set method=function %}
+    {% with method=function %}
     {% include 'method.jinja2' %}
+    {% endwith %}
     </tbody>
 </table>
 </div>

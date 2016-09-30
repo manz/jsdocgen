@@ -241,6 +241,8 @@ class Documentation(object):
             if 'type' in prop:
                 prop['typeRef'] = do_mark_safe(self.generate_types_reference(prop['type']['names']))
 
+        parents = []
+
         # we have a typedef for a callback
         if 'params' in typedef:
             named_params = self.generate_named_params(typedef)
@@ -248,17 +250,16 @@ class Documentation(object):
             if 'returns' in typedef:
                 return_value = self.generate_method_return_value(typedef)
                 typedef['returnValue'] = return_value
+        else:
+            if 'augments' in typedef:
+                parents = map(lambda c: self.generate_type_reference(c), typedef['augments'])
 
-        parents = []
-        if 'augments' in typedef:
-            parents = map(lambda c: self.generate_type_reference(c), typedef['augments'])
-
-        if 'description' in typedef:
-            splitted_description = typedef['description'].split('\n')
-            if len(splitted_description) > 1:
-                typedef['description'] = splitted_description[1]
-            else:
-                del typedef['description']
+            if 'description' in typedef:
+                splitted_description = typedef['description'].split('\n')
+                if len(splitted_description) > 1:
+                    typedef['description'] = splitted_description[1]
+                else:
+                    del typedef['description']
         typedef['docType'] = 'typedef'
         typedef['parents'] = parents
 

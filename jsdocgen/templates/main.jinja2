@@ -20,9 +20,16 @@
             {{ utils.render_title(element, 'constants') }}
             {% include 'enum.jinja2' %}
         {% elif element.docType=='typedef' %}
-            {% set typedef=element %}
-            {{ utils.render_title(element, 'object Specification') }}
-            {% include 'typedef.jinja2' %}
+            {% if element.signature %}
+                <h1>{{ element['description'] }}</h1>
+                {% with function=element %}
+                    {% include 'function.jinja2' %}
+                {% endwith %}
+            {% else %}
+                {% set typedef=element %}
+                {{ utils.render_title(element, 'object Specification') }}
+                {% include 'typedef.jinja2' %}
+            {% endif %}
         {% elif element.docType=='func' %}
             {% set function=element %}
             {% include 'function.jinja2' %}
