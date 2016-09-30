@@ -21,7 +21,6 @@
             {% include 'enum.jinja2' %}
         {% elif element.docType=='typedef' %}
             {% if element.signature %}
-                <h1>{{ element['description'] }}</h1>
                 {% with function=element %}
                     {% include 'function.jinja2' %}
                 {% endwith %}
