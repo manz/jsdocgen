@@ -23,5 +23,5 @@ setup(
     scripts=[
         'js-doc-gen'
     ],
-    install_requires=[str(requirement.req) for requirement in requirements]
+    install_requires=[requirement for requirement in requirements]
 )
